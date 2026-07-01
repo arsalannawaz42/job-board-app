@@ -1,0 +1,22 @@
+[
+  {
+    "id": 1,
+    "title": "Operations Officer",
+    "company": "National Bank of Pakistan",
+    "location": "Karachi",
+    "lastDate": "2026-07-15",
+    "description": "NBP is hiring Operations Officers for its Karachi branches. Graduates with banking interest can apply.",
+    "applyLink": "https://www.nbp.com.pk/careers",
+    "posted": "2026-06-30"
+  },
+  {
+    "id": 2,
+    "title": "Management Trainee Officer",
+    "company": "Habib Bank Limited (HBL)",
+    "location": "Lahore",
+    "lastDate": "2026-07-20",
+    "description": "HBL MTO program for fresh graduates. Selection through test and interview.",
+    "applyLink": "https://www.hbl.com/careers",
+    "posted": "2026-06-29"
+  }
+]

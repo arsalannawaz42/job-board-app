@@ -1,0 +1,101 @@
+@import url('https://fonts.googleapis.com/css2?family=Zilla+Slab:wght@600;700&family=Inter:wght@400;500;600&display=swap');
+
+:root{
+  --ink:#122029;
+  --paper:#F7F3EC;
+  --amber:#E8A33D;
+  --teal:#2F7A6F;
+  --line:#DDD5C4;
+  --muted:#6B665C;
+}
+*{box-sizing:border-box; margin:0; padding:0;}
+body{ font-family:'Inter', sans-serif; background:var(--paper); color:var(--ink); line-height:1.5; }
+h1,h2{ font-family:'Zilla Slab', serif; }
+a{ text-decoration:none; color:inherit; }
+
+.site-header{
+  background:var(--ink); color:var(--paper);
+  padding:16px 6%; display:flex; align-items:center; justify-content:space-between;
+  flex-wrap:wrap; gap:10px;
+}
+.logo{ font-family:'Zilla Slab', serif; font-size:1.5rem; font-weight:700; }
+.logo span{ color:var(--amber); }
+.site-nav{ display:flex; gap:20px; font-size:0.85rem; }
+.site-nav a{ color:#C9C2B2; }
+.site-nav a:hover, .site-nav a.active{ color:var(--amber); }
+
+.footer-links{ margin-top:8px; }
+.footer-links a{ margin:0 8px; color:var(--teal); font-size:0.85rem; }
+
+.static-page{ max-width:760px; margin:40px auto 70px; padding:0 6%; }
+.static-page h1{ font-size:1.8rem; margin-bottom:6px; }
+.static-page .updated{ color:var(--muted); font-size:0.85rem; margin-bottom:24px; }
+.static-page .card{ background:#fff; border:1px solid var(--line); border-radius:8px; padding:32px; }
+.static-page h2{ font-family:'Zilla Slab', serif; font-size:1.15rem; margin:22px 0 8px; }
+.static-page h2:first-child{ margin-top:0; }
+.static-page p{ color:#3c4a52; margin-bottom:10px; }
+.static-page ul{ padding-left:20px; color:#3c4a52; margin-bottom:10px; }
+.static-page a.inline-link{ color:var(--teal); font-weight:600; }
+.contact-box{ background:var(--paper-dim); border-radius:6px; padding:18px 20px; margin-top:16px; }
+.contact-box a{ color:var(--teal); font-weight:600; }
+
+.hero{ text-align:center; padding:44px 6% 30px; }
+.hero h1{ font-size:1.9rem; margin-bottom:8px; }
+.hero p{ color:var(--muted); }
+
+.ad-slot{
+  max-width:900px; margin:20px auto; padding:14px;
+  border:1px dashed var(--line); text-align:center; color:var(--muted); font-size:0.85rem;
+  border-radius:6px; background:#fff;
+}
+
+.filter-bar{
+  max-width:900px; margin:0 auto 10px; padding:0 6%;
+  display:flex; gap:12px; flex-wrap:wrap;
+}
+.filter-bar input, .filter-bar select{
+  padding:11px 14px; border:1px solid var(--line); border-radius:6px;
+  font-size:0.95rem; font-family:'Inter', sans-serif; background:#fff; color:var(--ink);
+}
+.filter-bar input{ flex:2; min-width:220px; }
+.filter-bar select{ flex:1; min-width:160px; }
+.filter-bar input:focus, .filter-bar select:focus{ outline:none; border-color:var(--teal); }
+
+.job-list{ max-width:900px; margin:20px auto 70px; padding:0 6%; }
+
+.job-card{
+  background:#fff; border:1px solid var(--line); border-left:4px solid var(--teal);
+  border-radius:6px; padding:20px 22px; margin-bottom:14px;
+}
+.job-card .top{ display:flex; justify-content:space-between; align-items:flex-start; gap:12px; flex-wrap:wrap; }
+.job-title{ font-family:'Zilla Slab', serif; font-size:1.25rem; font-weight:700; }
+.company{ color:var(--teal); font-weight:600; margin-top:2px; }
+.meta{ color:var(--muted); font-size:0.85rem; margin-top:6px; }
+.desc{ margin:12px 0; color:#3c4a52; font-size:0.95rem; }
+.apply-btn{
+  display:inline-block; background:var(--amber); color:var(--ink);
+  padding:10px 22px; border-radius:5px; font-weight:700; font-size:0.9rem;
+}
+.apply-btn:hover{ background:#d9922e; }
+.last-date{ font-size:0.8rem; color:#b23b3b; margin-top:8px; font-weight:600; }
+
+footer{ text-align:center; padding:24px; color:var(--muted); font-size:0.85rem; border-top:1px solid var(--line); }
+
+/* ---------- Admin page ---------- */
+.admin-wrap{ max-width:640px; margin:40px auto 80px; padding:0 6%; }
+.admin-wrap h1{ margin-bottom:20px; }
+.card{ background:#fff; border:1px solid var(--line); border-radius:8px; padding:28px; margin-bottom:24px; }
+.field{ margin-bottom:16px; }
+.field label{ display:block; font-size:0.85rem; font-weight:600; margin-bottom:5px; }
+.field input, .field textarea{
+  width:100%; padding:10px 12px; border:1px solid var(--line); border-radius:5px; font-size:0.95rem; font-family:'Inter', sans-serif;
+}
+.field-row{ display:flex; gap:12px; }
+.field-row .field{ flex:1; }
+.btn{ background:var(--teal); color:#fff; border:none; padding:12px 24px; border-radius:5px; font-weight:700; cursor:pointer; font-size:0.95rem; }
+.msg{ margin-top:12px; font-weight:600; font-size:0.9rem; }
+.admin-job-row{
+  display:flex; justify-content:space-between; align-items:center;
+  padding:10px 0; border-bottom:1px solid var(--line); font-size:0.9rem;
+}
+.del-btn{ background:#c0392b; color:#fff; border:none; padding:6px 14px; border-radius:4px; cursor:pointer; font-size:0.8rem; }
