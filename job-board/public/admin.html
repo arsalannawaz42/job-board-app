@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="ur">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin — DailyJobsPK</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="logo">Daily<span>JobsPK</span></div>
+  <a href="index.html" style="color:#fff; font-size:0.9rem;">← Website dekhein</a>
+</header>
+
+<div class="admin-wrap">
+  <h1>Admin Panel</h1>
+
+  <div class="card">
+    <div class="field">
+      <label>Admin Password</label>
+      <input type="password" id="adminPassword" placeholder="Password likhein">
+    </div>
+  </div>
+
+  <div class="card">
+    <h2 style="margin-bottom:16px; font-size:1.1rem;">Nayi Job Add Karein</h2>
+    <form id="jobForm">
+      <div class="field-row">
+        <div class="field">
+          <label>Job Title</label>
+          <input type="text" id="title" required placeholder="e.g. Cashier">
+        </div>
+        <div class="field">
+          <label>Company / Bank</label>
+          <input type="text" id="company" required placeholder="e.g. Meezan Bank">
+        </div>
+      </div>
+      <div class="field-row">
+        <div class="field">
+          <label>Location</label>
+          <input type="text" id="location" placeholder="e.g. Karachi">
+        </div>
+        <div class="field">
+          <label>Last Date to Apply</label>
+          <input type="date" id="lastDate">
+        </div>
+      </div>
+      <div class="field">
+        <label>Short Description</label>
+        <textarea id="description" rows="3" placeholder="Job ki thodi detail likhein..."></textarea>
+      </div>
+      <div class="field">
+        <label>Apply Link (official job posting ka URL)</label>
+        <input type="url" id="applyLink" required placeholder="https://...">
+      </div>
+      <button type="submit" class="btn">Job Add Karein</button>
+      <div id="formMsg" class="msg"></div>
+    </form>
+  </div>
+
+  <div class="card">
+    <h2 style="margin-bottom:16px; font-size:1.1rem;">Maujooda Jobs (Delete karne ke liye)</h2>
+    <div id="adminJobList">Loading...</div>
+  </div>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
