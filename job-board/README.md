@@ -32,6 +32,16 @@ Apna khud ka strong password rakhein.
 3. Job title, company, location, last date, description, aur **apply link** (jese Bank/company ki official job posting ka URL) daal ke "Job Add Karein" dabayein
 4. Job foran homepage par nazar aa jayegi
 
+## Naye Pages (AdSense ke liye)
+
+Website mein ab ye 3 zaroori pages bhi add ho gaye hain — Google AdSense inke bina application reject kar deta hai:
+
+- `about.html` — About Us
+- `contact.html` — Contact Us
+- `privacy.html` — Privacy Policy
+
+**Zaroori:** `contact.html` mein abhi placeholder email (`contact@dailyjobspk.com`) daala gaya hai — ise apni asli email se replace kar dein. Isi tarah `privacy.html` mein bhi jahan "DailyJobsPK" likha hai, agar aap website ka naam change karein to yahan bhi update kar lein.
+
 ## Income kaise generate karein (Monetization)
 
 1. **Google AdSense**: Apni website ko live karne ke baad AdSense account bana ke apply karein (adsense.google.com). Approve hone ke baad `index.html` mein jahan "Ad space" likha hai wahan apna AdSense code paste karein.

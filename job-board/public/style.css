@@ -16,9 +16,28 @@ a{ text-decoration:none; color:inherit; }
 .site-header{
   background:var(--ink); color:var(--paper);
   padding:16px 6%; display:flex; align-items:center; justify-content:space-between;
+  flex-wrap:wrap; gap:10px;
 }
 .logo{ font-family:'Zilla Slab', serif; font-size:1.5rem; font-weight:700; }
 .logo span{ color:var(--amber); }
+.site-nav{ display:flex; gap:20px; font-size:0.85rem; }
+.site-nav a{ color:#C9C2B2; }
+.site-nav a:hover, .site-nav a.active{ color:var(--amber); }
+
+.footer-links{ margin-top:8px; }
+.footer-links a{ margin:0 8px; color:var(--teal); font-size:0.85rem; }
+
+.static-page{ max-width:760px; margin:40px auto 70px; padding:0 6%; }
+.static-page h1{ font-size:1.8rem; margin-bottom:6px; }
+.static-page .updated{ color:var(--muted); font-size:0.85rem; margin-bottom:24px; }
+.static-page .card{ background:#fff; border:1px solid var(--line); border-radius:8px; padding:32px; }
+.static-page h2{ font-family:'Zilla Slab', serif; font-size:1.15rem; margin:22px 0 8px; }
+.static-page h2:first-child{ margin-top:0; }
+.static-page p{ color:#3c4a52; margin-bottom:10px; }
+.static-page ul{ padding-left:20px; color:#3c4a52; margin-bottom:10px; }
+.static-page a.inline-link{ color:var(--teal); font-weight:600; }
+.contact-box{ background:var(--paper-dim); border-radius:6px; padding:18px 20px; margin-top:16px; }
+.contact-box a{ color:var(--teal); font-weight:600; }
 
 .hero{ text-align:center; padding:44px 6% 30px; }
 .hero h1{ font-size:1.9rem; margin-bottom:8px; }
