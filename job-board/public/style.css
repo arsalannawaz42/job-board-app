@@ -57,9 +57,10 @@ a{ text-decoration:none; color:inherit; }
   padding:11px 14px; border:1px solid var(--line); border-radius:6px;
   font-size:0.95rem; font-family:'Inter', sans-serif; background:#fff; color:var(--ink);
 }
-.filter-bar input{ flex:2; min-width:220px; }
-.filter-bar select{ flex:1; min-width:160px; }
-.filter-bar input:focus, .filter-bar select:focus{ outline:none; border-color:var(--teal); }
+.filter-bar input{ flex:1; min-width:200px; }
+#searchInput{ flex:2; min-width:220px; }
+#cityFilter{ flex:1; min-width:160px; }
+.filter-bar input:focus{ outline:none; border-color:var(--teal); }
 
 .job-list{ max-width:900px; margin:20px auto 70px; padding:0 6%; }
 
