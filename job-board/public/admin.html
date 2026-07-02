@@ -41,40 +41,10 @@
       <div class="field-row">
         <div class="field">
           <label>City</label>
+          <!-- Options JS se (script.js -> PAKISTAN_CITIES) dynamically bharti hain,
+               taake ye list hamesha homepage ke city filter jaisi hi rahe. -->
           <select id="location" required>
             <option value="">-- Shehar Muntakhib Karein --</option>
-            <option>Karachi</option>
-            <option>Lahore</option>
-            <option>Islamabad</option>
-            <option>Rawalpindi</option>
-            <option>Faisalabad</option>
-            <option>Multan</option>
-            <option>Peshawar</option>
-            <option>Quetta</option>
-            <option>Sialkot</option>
-            <option>Gujranwala</option>
-            <option>Hyderabad</option>
-            <option>Sukkur</option>
-            <option>Bahawalpur</option>
-            <option>Sargodha</option>
-            <option>Sahiwal</option>
-            <option>Mardan</option>
-            <option>Abbottabad</option>
-            <option>Gujrat</option>
-            <option>Jhelum</option>
-            <option>Rahim Yar Khan</option>
-            <option>Larkana</option>
-            <option>Mirpur Khas</option>
-            <option>Nawabshah</option>
-            <option>Dera Ghazi Khan</option>
-            <option>Sheikhupura</option>
-            <option>Muzaffarabad</option>
-            <option>Gilgit</option>
-            <option>Kohat</option>
-            <option>Okara</option>
-            <option>Wah Cantt</option>
-            <option value="Remote">Remote / Work from Home</option>
-            <option value="Other">Other (khud likhein)</option>
           </select>
         </div>
         <div class="field" id="otherCityWrap" style="display:none;">
@@ -93,6 +63,12 @@
       <div class="field">
         <label>Apply Link (official job posting ka URL)</label>
         <input type="url" id="applyLink" required placeholder="https://...">
+      </div>
+      <div class="field">
+        <label>Job Advertisement / Picture (optional)</label>
+        <input type="file" id="jobImage" accept="image/png, image/jpeg, image/webp, image/gif">
+        <div id="imagePreviewName" class="file-hint"></div>
+        <div class="file-hint">JPG, PNG, WEBP ya GIF — max 3MB</div>
       </div>
       <button type="submit" class="btn">Job Add Karein</button>
       <div id="formMsg" class="msg"></div>
