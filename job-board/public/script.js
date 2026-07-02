@@ -91,13 +91,14 @@ async function loadPublicJobs() {
   }
 }
 
-// City filter dropdown ko HAMESHA Pakistan ki poori city list se bharta hai
+// City search box ke "datalist" ko HAMESHA Pakistan ki poori city list se bharta hai
 // (pehle ye sirf un cities se bharta tha jin mein koi job maujood ho — is
 // wajah se list bohot chhoti dikhti thi. Ab poori list hamesha available hai,
-// chahe kisi city mein job ho ya na ho.)
+// chahe kisi city mein job ho ya na ho.) User ab type karke city search kar sakta hai,
+// bade dropdown mein scroll nahi karna padta.
 function populateCityFilter() {
-  const cityFilter = document.getElementById("cityFilter");
-  if (!cityFilter) return;
+  const dataList = document.getElementById("cityListOptions");
+  if (!dataList) return;
 
   // agar kisi job ki city master list mein na ho (custom typed city),
   // usay bhi list mein shamil kar dete hain taake wo filter ho sake
@@ -109,9 +110,7 @@ function populateCityFilter() {
     a.localeCompare(b)
   );
 
-  cityFilter.innerHTML =
-    `<option value="">Tamam Shehar</option>` +
-    allCities.map((c) => `<option value="${c}">${c}</option>`).join("");
+  dataList.innerHTML = allCities.map((c) => `<option value="${c}"></option>`).join("");
 }
 
 // Search text aur city filter dono ko combine karke jobs dikhata hai
@@ -123,7 +122,7 @@ function renderFilteredJobs() {
   const cityFilter = document.getElementById("cityFilter");
 
   const keyword = (searchInput?.value || "").trim().toLowerCase();
-  const city = cityFilter?.value || "";
+  const city = (cityFilter?.value || "").trim().toLowerCase();
 
   if (allJobs.length === 0) {
     listEl.innerHTML = `<p style="text-align:center; color:#6B665C;">Filhaal koi job available nahi hai.</p>`;
@@ -137,7 +136,7 @@ function renderFilteredJobs() {
       job.company.toLowerCase().includes(keyword) ||
       (job.description || "").toLowerCase().includes(keyword);
 
-    const matchesCity = !city || job.location === city;
+    const matchesCity = !city || (job.location || "").toLowerCase().includes(city);
 
     return matchesKeyword && matchesCity;
   });
@@ -155,7 +154,7 @@ function setupFilters() {
   const cityFilter = document.getElementById("cityFilter");
 
   searchInput?.addEventListener("input", renderFilteredJobs);
-  cityFilter?.addEventListener("change", renderFilteredJobs);
+  cityFilter?.addEventListener("input", renderFilteredJobs);
 }
 
 // ---------- Admin page ----------
