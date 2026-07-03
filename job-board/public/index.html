@@ -1,12 +1,12 @@
 <!DOCTYPE html>
-<html lang="ur">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>DailyJobsPK — Rozana Nayi Jobs</title>
+<title>DailyJobsPK — Fresh Jobs Every Day</title>
 <link rel="stylesheet" href="style.css">
 
-<!-- 👇 Yahan apna Google AdSense code paste karein jab account approve ho jaye -->
+<!-- Paste your Google AdSense code here once your account is approved -->
 <!-- <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=YOUR-CLIENT-ID"></script> -->
 </head>
 <body>
@@ -22,21 +22,21 @@
 </header>
 
 <section class="hero">
-  <h1>Rozana Nayi Jobs — Banks, Companies aur Govt Sector se</h1>
-  <p>Sab jobs ka official link niche diya gaya hai — direct wahan apply karein</p>
+  <h1>Fresh Jobs Every Day — From Banks, Companies &amp; the Government Sector</h1>
+  <p>Every listing includes the official apply link — apply directly there</p>
 </section>
 
 <div class="filter-bar">
-  <input type="text" id="searchInput" placeholder="🔍 Job title ya company search karein...">
-  <input type="text" id="cityFilter" list="cityListOptions" placeholder="🏙️ Shehar likhein ya search karein..." autocomplete="off">
+  <input type="text" id="searchInput" placeholder="🔍 Search by job title or company...">
+  <input type="text" id="cityFilter" list="cityListOptions" placeholder="🏙️ Type or search a city..." autocomplete="off">
   <datalist id="cityListOptions"></datalist>
 </div>
 
-<div class="ad-slot">Ad space (Google AdSense yahan lagayein)</div>
+<div class="ad-slot">Ad space (Google AdSense will appear here)</div>
 
 <div class="job-list" id="jobList">Loading...</div>
 
-<div class="ad-slot">Ad space (Google AdSense yahan lagayein)</div>
+<div class="ad-slot">Ad space (Google AdSense will appear here)</div>
 
 <footer>
   &copy; 2026 DailyJobsPK
@@ -46,6 +46,12 @@
     <a href="privacy.html">Privacy Policy</a>
   </div>
 </footer>
+
+<!-- Lightbox: shows a job advertisement image full-size when clicked -->
+<div id="imageModal" class="image-modal" onclick="closeImageModal()">
+  <span class="image-modal-close">&times;</span>
+  <img id="imageModalImg" src="" alt="Job advertisement (full size)">
+</div>
 
 <script src="script.js"></script>
 </body>
