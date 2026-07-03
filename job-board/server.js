@@ -39,7 +39,7 @@ const upload = multer({
     const okExt = allowed.test(path.extname(file.originalname).toLowerCase());
     const okMime = allowed.test(file.mimetype);
     if (okExt && okMime) return cb(null, true);
-    cb(new Error("Sirf image files (jpg, png, webp, gif) allowed hain"));
+    cb(new Error("Only image files (jpg, png, webp, gif) are allowed"));
   },
 });
 
@@ -94,7 +94,7 @@ app.post("/api/jobs", upload.single("image"), checkAdmin, (req, res) => {
 
   if (!title || !company || !applyLink) {
     if (req.file) fs.unlink(req.file.path, () => {});
-    return res.status(400).json({ error: "title, company aur applyLink zaroori hain" });
+    return res.status(400).json({ error: "Title, company, and apply link are required" });
   }
 
   const newJob = {
@@ -119,7 +119,7 @@ app.delete("/api/jobs/:id", checkAdmin, (req, res) => {
   let jobs = readJobs();
   const id = parseInt(req.params.id);
   const job = jobs.find((j) => j.id === id);
-  if (!job) return res.status(404).json({ error: "Job nahi mili" });
+  if (!job) return res.status(404).json({ error: "Job not found" });
 
   // remove the job's image file from disk too, if it has one
   if (job.image) {
@@ -135,7 +135,7 @@ app.delete("/api/jobs/:id", checkAdmin, (req, res) => {
 // Multer errors (bad file type / too large) come through here
 app.use((err, req, res, next) => {
   if (err instanceof multer.MulterError || err) {
-    return res.status(400).json({ error: err.message || "Upload mein masla hua" });
+    return res.status(400).json({ error: err.message || "Something went wrong with the upload" });
   }
   next();
 });
