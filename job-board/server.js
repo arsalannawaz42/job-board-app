@@ -1,20 +1,36 @@
 // server.js
-// Simple job board backend.
-// Public: anyone can view jobs (GET /api/jobs)
-// Admin: adding/deleting jobs requires the admin password (set below)
-
 const express = require("express");
 const multer = require("multer");
 const fs = require("fs");
 const path = require("path");
+const mongoose = require("mongoose");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
-const JOBS_FILE = path.join(__dirname, "data", "jobs.json");
 const UPLOADS_DIR = path.join(__dirname, "public", "uploads");
 
 // 🔐 CHANGE THIS PASSWORD before putting the site online
 const ADMIN_PASSWORD = "myjobs123";
+
+// ---------- MongoDB Connection ----------
+mongoose.connect(process.env.MONGODB_URI)
+  .then(() => console.log("MongoDB connected"))
+  .catch((err) => console.error("MongoDB connection error:", err));
+
+// ---------- Job Schema ----------
+const jobSchema = new mongoose.Schema({
+  id: Number,
+  title: String,
+  company: String,
+  location: String,
+  lastDate: String,
+  description: String,
+  applyLink: String,
+  image: String,
+  posted: String,
+});
+
+const Job = mongoose.model("Job", jobSchema);
 
 // Make sure uploads folder exists
 if (!fs.existsSync(UPLOADS_DIR)) {
@@ -33,7 +49,7 @@ const storage = multer.diskStorage({
 
 const upload = multer({
   storage,
-  limits: { fileSize: 3 * 1024 * 1024 }, // 3MB max
+  limits: { fileSize: 3 * 1024 * 1024 },
   fileFilter: (req, file, cb) => {
     const allowed = /jpeg|jpg|png|webp|gif/;
     const okExt = allowed.test(path.extname(file.originalname).toLowerCase());
@@ -46,16 +62,6 @@ const upload = multer({
 app.use(express.json());
 app.use(express.static(path.join(__dirname, "public")));
 
-function readJobs() {
-  return JSON.parse(fs.readFileSync(JOBS_FILE, "utf-8"));
-}
-function writeJobs(jobs) {
-  fs.writeFileSync(JOBS_FILE, JSON.stringify(jobs, null, 2));
-}
-
-// Sort strictly by when the job was POSTED (newest first).
-// This never looks at lastDate — a job with no last date, or an
-// expired last date, still stays exactly where its post time puts it.
 function sortByPostedDesc(jobs) {
   return jobs.slice().sort((a, b) => {
     const timeA = new Date(a.posted).getTime();
@@ -63,12 +69,10 @@ function sortByPostedDesc(jobs) {
     const safeA = Number.isFinite(timeA) ? timeA : 0;
     const safeB = Number.isFinite(timeB) ? timeB : 0;
     if (safeB !== safeA) return safeB - safeA;
-    // tie-breaker: higher id = added later = should come first
     return (b.id || 0) - (a.id || 0);
   });
 }
 
-// Middleware to protect admin routes
 function checkAdmin(req, res, next) {
   const password = req.headers["x-admin-password"] || req.body.adminPassword;
   if (password !== ADMIN_PASSWORD) {
@@ -78,61 +82,65 @@ function checkAdmin(req, res, next) {
 }
 
 // ---------- PUBLIC ----------
-
-// Get all jobs (newest posted first, independent of lastDate)
-app.get("/api/jobs", (req, res) => {
-  const jobs = sortByPostedDesc(readJobs());
-  res.json(jobs);
+app.get("/api/jobs", async (req, res) => {
+  try {
+    const jobs = await Job.find({});
+    res.json(sortByPostedDesc(jobs));
+  } catch (err) {
+    res.status(500).json({ error: "Failed to fetch jobs" });
+  }
 });
 
 // ---------- ADMIN ----------
+app.post("/api/jobs", upload.single("image"), checkAdmin, async (req, res) => {
+  try {
+    const { title, company, location, lastDate, description, applyLink } = req.body;
 
-// Add a new job (multipart/form-data so an image can be attached)
-app.post("/api/jobs", upload.single("image"), checkAdmin, (req, res) => {
-  const jobs = readJobs();
-  const { title, company, location, lastDate, description, applyLink } = req.body;
+    if (!title || !company || !applyLink) {
+      if (req.file) fs.unlink(req.file.path, () => {});
+      return res.status(400).json({ error: "Title, company, and apply link are required" });
+    }
 
-  if (!title || !company || !applyLink) {
-    if (req.file) fs.unlink(req.file.path, () => {});
-    return res.status(400).json({ error: "Title, company, and apply link are required" });
+    const lastJob = await Job.findOne().sort({ id: -1 });
+    const newId = lastJob ? lastJob.id + 1 : 1;
+
+    const newJob = new Job({
+      id: newId,
+      title,
+      company,
+      location: location || "",
+      lastDate: lastDate || "",
+      description: description || "",
+      applyLink,
+      image: req.file ? `/uploads/${req.file.filename}` : "",
+      posted: new Date().toISOString(),
+    });
+
+    await newJob.save();
+    res.status(201).json(newJob);
+  } catch (err) {
+    res.status(500).json({ error: "Failed to add job" });
   }
-
-  const newJob = {
-    id: jobs.length ? Math.max(...jobs.map((j) => j.id)) + 1 : 1,
-    title,
-    company,
-    location: location || "",
-    lastDate: lastDate || "",
-    description: description || "",
-    applyLink,
-    image: req.file ? `/uploads/${req.file.filename}` : "",
-    posted: new Date().toISOString(), // full timestamp -> exact posting order
-  };
-
-  jobs.push(newJob);
-  writeJobs(jobs);
-  res.status(201).json(newJob);
 });
 
-// Delete a job
-app.delete("/api/jobs/:id", checkAdmin, (req, res) => {
-  let jobs = readJobs();
-  const id = parseInt(req.params.id);
-  const job = jobs.find((j) => j.id === id);
-  if (!job) return res.status(404).json({ error: "Job not found" });
+app.delete("/api/jobs/:id", checkAdmin, async (req, res) => {
+  try {
+    const id = parseInt(req.params.id);
+    const job = await Job.findOne({ id });
+    if (!job) return res.status(404).json({ error: "Job not found" });
 
-  // remove the job's image file from disk too, if it has one
-  if (job.image) {
-    const imgPath = path.join(__dirname, "public", job.image);
-    fs.unlink(imgPath, () => {});
+    if (job.image) {
+      const imgPath = path.join(__dirname, "public", job.image);
+      fs.unlink(imgPath, () => {});
+    }
+
+    await Job.deleteOne({ id });
+    res.json({ success: true });
+  } catch (err) {
+    res.status(500).json({ error: "Failed to delete job" });
   }
-
-  jobs = jobs.filter((j) => j.id !== id);
-  writeJobs(jobs);
-  res.json({ success: true });
 });
 
-// Multer errors (bad file type / too large) come through here
 app.use((err, req, res, next) => {
   if (err instanceof multer.MulterError || err) {
     return res.status(400).json({ error: err.message || "Something went wrong with the upload" });
