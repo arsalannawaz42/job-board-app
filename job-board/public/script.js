@@ -1,9 +1,9 @@
 // ---------- Shared state ----------
-let allJobs = []; // saari jobs yahan store hoti hain (public homepage ke liye)
+let allJobs = []; // holds all jobs for the public homepage
 
 // Master list of Pakistani cities. Used for BOTH:
 //   1) the "City" dropdown when posting a job (admin.html)
-//   2) the city search/filter dropdown on the homepage (index.html)
+//   2) the city search box on the homepage (index.html)
 // Using ONE shared list keeps them always in sync — whatever city an
 // admin picks while posting is guaranteed to already exist in the
 // public filter, so there's no mismatch between the two.
@@ -42,12 +42,18 @@ const PAKISTAN_CITIES = [
   "Remote / Work from Home",
 ].sort((a, b) => a.localeCompare(b));
 
-// Ek job card ka HTML banata hai
+// Builds the HTML for a single job card
 function jobCardHTML(job) {
   const postedLabel = formatDate(job.posted);
   return `
     <div class="job-card">
-      ${job.image ? `<img class="job-image" src="${job.image}" alt="${job.title} advertisement">` : ""}
+      ${
+        job.image
+          ? `<div class="job-image-wrap" onclick="openImageModal('${job.image}')">
+               <img class="job-image" src="${job.image}" alt="${job.title} advertisement">
+             </div>`
+          : ""
+      }
       <div class="top">
         <div>
           <div class="job-title">${job.title}</div>
@@ -63,11 +69,25 @@ function jobCardHTML(job) {
   `;
 }
 
-// "2026-06-30T10:15:00.000Z" jaisi ISO string ko readable date mein badalta hai
+// Turns an ISO date string like "2026-06-30T10:15:00.000Z" into a readable date
 function formatDate(isoString) {
   const d = new Date(isoString);
   if (isNaN(d.getTime())) return isoString || "";
   return d.toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" });
+}
+
+// ---------- Image lightbox (click a job image to view it full-size) ----------
+function openImageModal(src) {
+  const modal = document.getElementById("imageModal");
+  const modalImg = document.getElementById("imageModalImg");
+  if (!modal || !modalImg) return;
+  modalImg.src = src;
+  modal.classList.add("active");
+}
+
+function closeImageModal() {
+  const modal = document.getElementById("imageModal");
+  if (modal) modal.classList.remove("active");
 }
 
 // ---------- Public homepage ----------
@@ -79,29 +99,28 @@ async function loadPublicJobs() {
     const res = await fetch("/api/jobs");
     allJobs = await res.json();
 
-    // Jobs hamesha "posted" time ke hisaab se newest-first hoti hain.
-    // "lastDate" (apply deadline) ka is sort se koi lena dena nahi —
-    // job ki lastDate ho ya na ho, wo apni posting-time position par hi rehti hai.
+    // Jobs are always sorted newest-first by their POSTED time.
+    // The "Last Date to Apply" field never affects this sort — whether or
+    // not a job has a last date, it keeps its rightful posting-time position.
     allJobs.sort((a, b) => new Date(b.posted) - new Date(a.posted));
 
     populateCityFilter();
     renderFilteredJobs();
   } catch (err) {
-    listEl.innerHTML = `<p>Jobs load nahi ho sakin. Server check karein.</p>`;
+    listEl.innerHTML = `<p>Could not load jobs. Please check the server.</p>`;
   }
 }
 
-// City search box ke "datalist" ko HAMESHA Pakistan ki poori city list se bharta hai
-// (pehle ye sirf un cities se bharta tha jin mein koi job maujood ho — is
-// wajah se list bohot chhoti dikhti thi. Ab poori list hamesha available hai,
-// chahe kisi city mein job ho ya na ho.) User ab type karke city search kar sakta hai,
-// bade dropdown mein scroll nahi karna padta.
+// Fills the city search box's suggestion list with the FULL Pakistan city list
+// (previously it only listed cities that already had a job posted, so it looked
+// very short). Now the full list is always available, whether or not a city
+// currently has any jobs.
 function populateCityFilter() {
   const dataList = document.getElementById("cityListOptions");
   if (!dataList) return;
 
-  // agar kisi job ki city master list mein na ho (custom typed city),
-  // usay bhi list mein shamil kar dete hain taake wo filter ho sake
+  // if a job's city isn't in the master list (a custom typed city),
+  // include it too so it can still be searched/filtered
   const extraCities = allJobs
     .map((j) => j.location)
     .filter((loc) => loc && !PAKISTAN_CITIES.includes(loc));
@@ -113,7 +132,7 @@ function populateCityFilter() {
   dataList.innerHTML = allCities.map((c) => `<option value="${c}"></option>`).join("");
 }
 
-// Search text aur city filter dono ko combine karke jobs dikhata hai
+// Combines the keyword search and city filter to render matching jobs
 function renderFilteredJobs() {
   const listEl = document.getElementById("jobList");
   if (!listEl) return;
@@ -125,7 +144,7 @@ function renderFilteredJobs() {
   const city = (cityFilter?.value || "").trim().toLowerCase();
 
   if (allJobs.length === 0) {
-    listEl.innerHTML = `<p style="text-align:center; color:#6B665C;">Filhaal koi job available nahi hai.</p>`;
+    listEl.innerHTML = `<p style="text-align:center; color:#6B665C;">No jobs available right now.</p>`;
     return;
   }
 
@@ -142,7 +161,7 @@ function renderFilteredJobs() {
   });
 
   if (filtered.length === 0) {
-    listEl.innerHTML = `<p style="text-align:center; color:#6B665C;">Is search/shehar ke liye koi job nahi mili.</p>`;
+    listEl.innerHTML = `<p style="text-align:center; color:#6B665C;">No jobs found for this search/city.</p>`;
     return;
   }
 
@@ -162,8 +181,8 @@ function getAdminPassword() {
   return document.getElementById("adminPassword")?.value || "";
 }
 
-// Admin ke "City" dropdown ko bhi usi master Pakistan city list se bharta hai,
-// aakhir mein "Remote" already list mein hai, aur "Other" manually add karte hain.
+// Fills the admin's "City" dropdown from the same master Pakistan city list,
+// with "Other" added at the end for manual entry.
 function populateAdminCityDropdown() {
   const citySelect = document.getElementById("location");
   if (!citySelect) return;
@@ -171,9 +190,9 @@ function populateAdminCityDropdown() {
   const options = PAKISTAN_CITIES.map((c) => `<option value="${c}">${c}</option>`).join("");
 
   citySelect.innerHTML =
-    `<option value="">-- Shehar Muntakhib Karein --</option>` +
+    `<option value="">-- Select City --</option>` +
     options +
-    `<option value="Other">Other (khud likhein)</option>`;
+    `<option value="Other">Other (type manually)</option>`;
 }
 
 async function loadAdminJobs() {
@@ -184,7 +203,7 @@ async function loadAdminJobs() {
   const jobs = await res.json();
 
   if (jobs.length === 0) {
-    el.innerHTML = "<p>Koi job nahi hai.</p>";
+    el.innerHTML = "<p>No jobs yet.</p>";
     return;
   }
 
@@ -203,10 +222,10 @@ async function loadAdminJobs() {
 async function deleteJob(id) {
   const password = getAdminPassword();
   if (!password) {
-    alert("Pehle admin password likhein.");
+    alert("Please enter the admin password first.");
     return;
   }
-  if (!confirm("Kya aap is job ko delete karna chahte hain?")) return;
+  if (!confirm("Are you sure you want to delete this job?")) return;
 
   const res = await fetch(`/api/jobs/${id}`, {
     method: "DELETE",
@@ -214,13 +233,13 @@ async function deleteJob(id) {
   });
 
   if (res.status === 401) {
-    alert("Password ghalat hai.");
+    alert("Incorrect password.");
     return;
   }
   loadAdminJobs();
 }
 
-// "City" dropdown mein "Other" select hone par manual text field dikhana
+// Shows the manual text field when "Other" is selected in the City dropdown
 function setupCityDropdown() {
   const citySelect = document.getElementById("location");
   const otherWrap = document.getElementById("otherCityWrap");
@@ -239,7 +258,7 @@ function setupCityDropdown() {
   });
 }
 
-// Image field ke liye chuni gayi file ka naam/preview dikhana
+// Shows the selected file's name as a small preview label
 function setupImagePreview() {
   const imageInput = document.getElementById("jobImage");
   const previewEl = document.getElementById("imagePreviewName");
@@ -263,7 +282,7 @@ function setupAdminForm() {
 
     if (!password) {
       msgEl.style.color = "#c0392b";
-      msgEl.textContent = "Pehle admin password likhein.";
+      msgEl.textContent = "Please enter the admin password first.";
       return;
     }
 
@@ -272,8 +291,8 @@ function setupAdminForm() {
     const finalCity =
       citySelect.value === "Other" ? otherCityInput.value.trim() : citySelect.value;
 
-    // FormData istemal karte hain taake job advertisement image bhi
-    // bhej sakein (multipart/form-data), sirf JSON text nahi.
+    // FormData is used so the job advertisement image can be sent too
+    // (multipart/form-data), not just JSON text.
     const formData = new FormData();
     formData.append("title", document.getElementById("title").value);
     formData.append("company", document.getElementById("company").value);
@@ -292,15 +311,15 @@ function setupAdminForm() {
         method: "POST",
         headers: {
           "x-admin-password": password,
-          // Content-Type set NAHI karte — browser khud multipart
-          // boundary ke saath set karega jab FormData bhejte hain.
+          // Content-Type is NOT set manually — the browser sets the
+          // correct multipart boundary automatically for FormData.
         },
         body: formData,
       });
 
       if (res.status === 401) {
         msgEl.style.color = "#c0392b";
-        msgEl.textContent = "Password ghalat hai.";
+        msgEl.textContent = "Incorrect password.";
         return;
       }
       if (!res.ok) {
@@ -309,7 +328,7 @@ function setupAdminForm() {
       }
 
       msgEl.style.color = "#2F7A6F";
-      msgEl.textContent = "Job add ho gayi!";
+      msgEl.textContent = "Job added successfully!";
       form.reset();
       document.getElementById("otherCityWrap").style.display = "none";
       const previewEl = document.getElementById("imagePreviewName");
@@ -317,7 +336,7 @@ function setupAdminForm() {
       loadAdminJobs();
     } catch (err) {
       msgEl.style.color = "#c0392b";
-      msgEl.textContent = err.message || "Kuch masla hua, dobara try karein.";
+      msgEl.textContent = err.message || "Something went wrong, please try again.";
     }
   });
 }
