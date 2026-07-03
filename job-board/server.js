@@ -1,13 +1,13 @@
 // server.js
 const express = require("express");
 const multer = require("multer");
-const fs = require("fs");
 const path = require("path");
 const mongoose = require("mongoose");
+const cloudinary = require("cloudinary").v2;
+const { CloudinaryStorage } = require("multer-storage-cloudinary");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
-const UPLOADS_DIR = path.join(__dirname, "public", "uploads");
 
 // 🔐 CHANGE THIS PASSWORD before putting the site online
 const ADMIN_PASSWORD = "myjobs123";
@@ -16,6 +16,13 @@ const ADMIN_PASSWORD = "myjobs123";
 mongoose.connect(process.env.MONGODB_URI)
   .then(() => console.log("MongoDB connected"))
   .catch((err) => console.error("MongoDB connection error:", err));
+
+// ---------- Cloudinary Config ----------
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+});
 
 // ---------- Job Schema ----------
 const jobSchema = new mongoose.Schema({
@@ -27,36 +34,24 @@ const jobSchema = new mongoose.Schema({
   description: String,
   applyLink: String,
   image: String,
+  imagePublicId: String, // needed so we can delete the image from Cloudinary later
   posted: String,
 });
 
 const Job = mongoose.model("Job", jobSchema);
 
-// Make sure uploads folder exists
-if (!fs.existsSync(UPLOADS_DIR)) {
-  fs.mkdirSync(UPLOADS_DIR, { recursive: true });
-}
-
-// ---------- Image upload config (multer) ----------
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => cb(null, UPLOADS_DIR),
-  filename: (req, file, cb) => {
-    const ext = path.extname(file.originalname).toLowerCase();
-    const unique = `${Date.now()}-${Math.round(Math.random() * 1e9)}${ext}`;
-    cb(null, unique);
+// ---------- Image upload config (multer -> Cloudinary) ----------
+const storage = new CloudinaryStorage({
+  cloudinary: cloudinary,
+  params: {
+    folder: "job-board", // all images will be stored inside this Cloudinary folder
+    allowed_formats: ["jpg", "jpeg", "png", "webp", "gif"],
   },
 });
 
 const upload = multer({
   storage,
   limits: { fileSize: 3 * 1024 * 1024 },
-  fileFilter: (req, file, cb) => {
-    const allowed = /jpeg|jpg|png|webp|gif/;
-    const okExt = allowed.test(path.extname(file.originalname).toLowerCase());
-    const okMime = allowed.test(file.mimetype);
-    if (okExt && okMime) return cb(null, true);
-    cb(new Error("Only image files (jpg, png, webp, gif) are allowed"));
-  },
 });
 
 app.use(express.json());
@@ -102,7 +97,9 @@ app.post("/api/jobs", upload.single("image"), checkAdmin, async (req, res) => {
     const { title, company, location, lastDate, description, applyLink } = req.body;
 
     if (!title || !company || !applyLink) {
-      if (req.file) fs.unlink(req.file.path, () => {});
+      if (req.file && req.file.filename) {
+        cloudinary.uploader.destroy(req.file.filename).catch(() => {});
+      }
       return res.status(400).json({ error: "Title, company, and apply link are required" });
     }
 
@@ -117,7 +114,8 @@ app.post("/api/jobs", upload.single("image"), checkAdmin, async (req, res) => {
       lastDate: lastDate || "",
       description: description || "",
       applyLink,
-      image: req.file ? `/uploads/${req.file.filename}` : "",
+      image: req.file ? req.file.path : "", // Cloudinary's hosted URL
+      imagePublicId: req.file ? req.file.filename : "", // Cloudinary's public_id, for deletion later
       posted: new Date().toISOString(),
     });
 
@@ -134,9 +132,8 @@ app.delete("/api/jobs/:id", checkAdmin, async (req, res) => {
     const job = await Job.findOne({ id });
     if (!job) return res.status(404).json({ error: "Job not found" });
 
-    if (job.image) {
-      const imgPath = path.join(__dirname, "public", job.image);
-      fs.unlink(imgPath, () => {});
+    if (job.imagePublicId) {
+      cloudinary.uploader.destroy(job.imagePublicId).catch(() => {});
     }
 
     await Job.deleteOne({ id });
