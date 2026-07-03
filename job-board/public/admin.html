@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ur">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -11,7 +11,7 @@
 <header class="site-header">
   <div class="logo">Daily<span>JobsPK</span></div>
   <nav class="site-nav">
-    <a href="index.html">← Website dekhein</a>
+    <a href="index.html">← View Website</a>
   </nav>
 </header>
 
@@ -21,12 +21,12 @@
   <div class="card">
     <div class="field">
       <label>Admin Password</label>
-      <input type="password" id="adminPassword" placeholder="Password likhein">
+      <input type="password" id="adminPassword" placeholder="Enter password">
     </div>
   </div>
 
   <div class="card">
-    <h2 style="margin-bottom:16px; font-size:1.1rem;">Nayi Job Add Karein</h2>
+    <h2 style="margin-bottom:16px; font-size:1.1rem;">Add New Job</h2>
     <form id="jobForm">
       <div class="field-row">
         <div class="field">
@@ -41,14 +41,14 @@
       <div class="field-row">
         <div class="field">
           <label>City</label>
-          <!-- Options JS se (script.js -> PAKISTAN_CITIES) dynamically bharti hain,
-               taake ye list hamesha homepage ke city filter jaisi hi rahe. -->
+          <!-- Options are filled in dynamically by script.js (PAKISTAN_CITIES),
+               so this list always stays identical to the homepage city filter. -->
           <select id="location" required>
-            <option value="">-- Shehar Muntakhib Karein --</option>
+            <option value="">-- Select City --</option>
           </select>
         </div>
         <div class="field" id="otherCityWrap" style="display:none;">
-          <label>Shehar ka naam likhein</label>
+          <label>Enter city name</label>
           <input type="text" id="otherCity" placeholder="e.g. Sadiqabad">
         </div>
         <div class="field">
@@ -58,25 +58,25 @@
       </div>
       <div class="field">
         <label>Short Description</label>
-        <textarea id="description" rows="3" placeholder="Job ki thodi detail likhein..."></textarea>
+        <textarea id="description" rows="3" placeholder="Write a short job description..."></textarea>
       </div>
       <div class="field">
-        <label>Apply Link (official job posting ka URL)</label>
+        <label>Apply Link (official job posting URL)</label>
         <input type="url" id="applyLink" required placeholder="https://...">
       </div>
       <div class="field">
         <label>Job Advertisement / Picture (optional)</label>
         <input type="file" id="jobImage" accept="image/png, image/jpeg, image/webp, image/gif">
         <div id="imagePreviewName" class="file-hint"></div>
-        <div class="file-hint">JPG, PNG, WEBP ya GIF — max 3MB</div>
+        <div class="file-hint">JPG, PNG, WEBP or GIF — max 3MB</div>
       </div>
-      <button type="submit" class="btn">Job Add Karein</button>
+      <button type="submit" class="btn">Add Job</button>
       <div id="formMsg" class="msg"></div>
     </form>
   </div>
 
   <div class="card">
-    <h2 style="margin-bottom:16px; font-size:1.1rem;">Maujooda Jobs (Delete karne ke liye)</h2>
+    <h2 style="margin-bottom:16px; font-size:1.1rem;">Current Jobs (click Delete to remove)</h2>
     <div id="adminJobList">Loading...</div>
   </div>
 </div>
